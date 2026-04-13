@@ -220,7 +220,7 @@ async function handleCopyCommand(
     input: string,
     blocks: { lang: string; code: string }[],
 ): Promise<boolean> {
-    const copyMatch = input.match(/^copy\s+(.+)$/i);
+    const copyMatch = input.match(/^(?:copy\s+)?(\d+|all)$/i);
     if (!copyMatch) return false;
 
     const arg = copyMatch[1]!.trim().toLowerCase();
@@ -432,6 +432,20 @@ async function main() {
 
             lastBlocks = extractCodeBlocks(response);
             showCodeBlockIndex(lastBlocks);
+
+            // Prompt for copy commands when code blocks are present
+            if (lastBlocks.length > 0) {
+                const askCopy = (): Promise<string> =>
+                    new Promise((resolve) =>
+                        rl.question("\x1b[2m(copy <n> / copy all / enter to continue):\x1b[0m ", resolve),
+                    );
+                while (true) {
+                    const copyInput = (await askCopy()).trim();
+                    if (!copyInput) break;
+                    if (await handleCopyCommand(copyInput, lastBlocks)) continue;
+                    console.log("\x1b[2mType copy <n>, copy all, or press enter to continue\x1b[0m");
+                }
+            }
         } catch (err: any) {
             console.error(`\x1b[31mError: ${err.message}\x1b[0m`);
         }

@@ -76,16 +76,18 @@ bun run index.ts -h
 
 ### Chat commands
 
-| Command         | Action                            |
-| --------------- | --------------------------------- |
-| `copy <n>`      | Copy code block #n to clipboard   |
-| `copy all`      | Copy all code blocks to clipboard |
-| `save <file>`   | Save last response to a file      |
-| `model <name>`  | Switch to a different model       |
-| `models`        | List available Ollama models      |
-| `think`         | Toggle thinking mode on/off       |
-| `think on/off`  | Set thinking mode explicitly      |
-| `exit` / `quit` | End the chat                      |
+| Command             | Action                            |
+| ------------------- | --------------------------------- |
+| `<n>` or `copy <n>` | Copy code block #n to clipboard   |
+| `all` or `copy all` | Copy all code blocks to clipboard |
+| `save <file>`       | Save last response to a file      |
+| `model <name>`      | Switch to a different model       |
+| `models`            | List available Ollama models      |
+| `think`             | Toggle thinking mode on/off       |
+| `think on/off`      | Set thinking mode explicitly      |
+| `exit` / `quit`     | End the chat                      |
+
+After each response with code blocks, a copy prompt appears where you can type a block number, `all`, or press enter to continue chatting.
 
 ## Install as a global command
 
@@ -116,24 +118,6 @@ ollama-chat README.md
 - **Thinking mode** — enable chain-of-thought reasoning with `-t` flag or `think` command
 - **Conversation memory** — chat mode maintains full message history
 
-## Compile to Executable
+## Note on compiled binaries
 
-Build a standalone binary with no runtime dependencies using `bun build --compile`:
-
-```bash
-bun build --compile index.ts --outfile ollama-chat
-```
-
-Then run it directly:
-
-```bash
-./ollama-chat "explain async/await in JavaScript"
-./ollama-chat -t -m qwen3.5:27b
-./ollama-chat README.md
-```
-
-Optionally move it to your PATH:
-
-```bash
-sudo mv ollama-chat /usr/local/bin/
-```
+Bun's `--compile` flag currently produces unsigned ARM64 binaries that macOS kills on Apple Silicon. Use the shell wrapper install method above instead.
