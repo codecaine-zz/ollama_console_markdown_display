@@ -118,10 +118,20 @@ async function streamChat(
     messages: Message[],
     think: boolean = false,
 ): Promise<string> {
+    // Qwen3 models default to thinking mode; append /no_think to suppress it
+    let chatMessages = messages;
+    if (!think && model.toLowerCase().includes("qwen3")) {
+        chatMessages = messages.map((m, i) =>
+            i === messages.length - 1 && m.role === "user"
+                ? { ...m, content: m.content + " /no_think" }
+                : m,
+        );
+    }
+
     const res = await fetch(`${OLLAMA_BASE}/api/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ model, messages, stream: true, think }),
+        body: JSON.stringify({ model, messages: chatMessages, stream: true, think }),
     });
 
     if (!res.ok) {
