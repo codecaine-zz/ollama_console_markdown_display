@@ -10,7 +10,7 @@ Chat with Ollama models in your terminal with beautifully rendered markdown outp
 
 - macOS (ARM or Intel)
 - [Bun](https://bun.sh) v1.3.12+
-- [Ollama](https://ollama.ai) running locally
+- [Ollama](https://ollama.ai) installed (started automatically if not running)
 
 ## Usage
 
@@ -121,6 +121,18 @@ ollama-chat README.md
 - **Model switching** — switch models mid-chat with `model <name>`, list with `models`
 - **Thinking mode** — enable chain-of-thought reasoning with `-t` flag or `think` command
 - **Conversation memory** — chat mode maintains full message history
+- **Automatic Ollama startup** — detects if Ollama is running and starts it automatically if needed
+
+## Automatic Ollama Startup
+
+The main function includes an enhanced Ollama startup process that handles server availability automatically:
+
+1. **Detection** — on launch, the app checks if Ollama is already running by pinging `http://localhost:11434/api/tags`
+2. **Auto-start** — if Ollama is not running, it spawns `ollama serve` in the background and waits up to 15 seconds for it to become ready
+3. **Error handling** — if Ollama fails to start (e.g. not installed), an error message is displayed with a link to the installation page at https://ollama.ai
+4. **Graceful cleanup** — signal handlers (`SIGINT`, `SIGTERM`, `exit`) ensure the spawned Ollama process is stopped when the app exits
+
+No manual server management is required — just run the app and it takes care of the rest.
 
 ## Note on compiled binaries
 

@@ -307,15 +307,43 @@ async function main() {
         return;
     }
 
-    // Check ollama is running
+    // Check ollama is running, start it if not
+    let ollamaProc: ReturnType<typeof Bun.spawn> | null = null;
+    const stopOllama = () => {
+        if (ollamaProc) {
+            ollamaProc.kill();
+            ollamaProc = null;
+        }
+    };
+    process.on("exit", stopOllama);
+    process.on("SIGINT", () => { stopOllama(); process.exit(0); });
+    process.on("SIGTERM", () => { stopOllama(); process.exit(0); });
+
     try {
         await fetch(`${OLLAMA_BASE}/api/tags`);
     } catch {
-        console.error(
-            "\x1b[31mError: Cannot connect to Ollama at " + OLLAMA_BASE + "\x1b[0m",
-        );
-        console.error("Make sure Ollama is running: ollama serve");
-        process.exit(1);
+        console.log("\x1b[33mOllama is not running. Starting it...\x1b[0m");
+        ollamaProc = Bun.spawn(["ollama", "serve"], {
+            stdout: "ignore",
+            stderr: "ignore",
+        });
+        ollamaProc.unref();
+        // Wait for Ollama to be ready (up to 15 seconds)
+        let ready = false;
+        for (let i = 0; i < 30; i++) {
+            await Bun.sleep(500);
+            try {
+                await fetch(`${OLLAMA_BASE}/api/tags`);
+                ready = true;
+                break;
+            } catch { }
+        }
+        if (!ready) {
+            console.error("\x1b[31mError: Failed to start Ollama. Is it installed?\x1b[0m");
+            console.error("Install from https://ollama.ai");
+            process.exit(1);
+        }
+        console.log("\x1b[32m✓ Ollama started (will stop when you exit)\x1b[0m");
     }
 
     console.log(`\x1b[2mModel: ${model}${think ? " (thinking mode)" : ""}\x1b[0m`);
@@ -480,6 +508,8 @@ async function main() {
             console.error(`\x1b[31mError: ${err.message}\x1b[0m`);
         }
     }
+
+    stopOllama();
 }
 
 main();
