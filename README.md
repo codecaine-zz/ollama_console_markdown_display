@@ -87,6 +87,24 @@ bun run index.ts -h
 | `think on/off`  | Set thinking mode explicitly      |
 | `exit` / `quit` | End the chat                      |
 
+## Install as a global command
+
+Bun's `--compile` flag produces unsigned ARM64 binaries that macOS kills on Apple Silicon. Use a shell wrapper instead:
+
+```bash
+# Make the wrapper script executable and link it into your PATH
+chmod +x ollama-chat.sh
+sudo ln -sf "$(pwd)/ollama-chat.sh" /usr/local/bin/ollama-chat
+```
+
+Now you can use it from anywhere:
+
+```bash
+ollama-chat "explain closures in JavaScript"
+ollama-chat -m qwen3.5:27b -t "why is the sky blue"
+ollama-chat README.md
+```
+
 ## Features
 
 - **Streaming** — tokens appear in real-time, then get replaced with formatted markdown
