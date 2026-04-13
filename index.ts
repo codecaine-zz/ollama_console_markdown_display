@@ -1,4 +1,4 @@
-const DEFAULT_MODEL = "qwen3.5:latest";
+const DEFAULT_MODEL = "qwen3.5:4b";
 const OLLAMA_BASE = "http://localhost:11434";
 
 // --- CLI argument parsing ---
@@ -143,6 +143,28 @@ async function streamChat(
     let fullResponse = "";
     let thinkingContent = "";
     let isThinking = false;
+    let receivedFirstToken = false;
+
+    // Show a spinner while waiting for the model to start responding in think mode
+    const spinnerFrames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
+    let spinnerIdx = 0;
+    let spinnerTimer: ReturnType<typeof setInterval> | null = null;
+
+    if (think) {
+        process.stdout.write(`\x1b[2m\x1b[3m${spinnerFrames[0]} Model is thinking...\x1b[0m`);
+        spinnerTimer = setInterval(() => {
+            spinnerIdx = (spinnerIdx + 1) % spinnerFrames.length;
+            process.stdout.write(`\r\x1b[2m\x1b[3m${spinnerFrames[spinnerIdx]} Model is thinking...\x1b[0m`);
+        }, 80);
+    }
+
+    function stopSpinner() {
+        if (spinnerTimer) {
+            clearInterval(spinnerTimer);
+            spinnerTimer = null;
+            process.stdout.write("\r\x1b[K"); // clear spinner line
+        }
+    }
 
     // Save cursor position before streaming raw tokens
     process.stdout.write("\x1b7");
@@ -156,6 +178,12 @@ async function streamChat(
             try {
                 const json = JSON.parse(line);
                 if (json.message?.content) {
+                    if (!receivedFirstToken) {
+                        receivedFirstToken = true;
+                        stopSpinner();
+                        // Re-save cursor after clearing spinner
+                        process.stdout.write("\x1b7");
+                    }
                     // Track thinking state via <think> tags
                     const content = json.message.content;
                     if (content.includes("<think>")) {
@@ -179,6 +207,8 @@ async function streamChat(
             }
         }
     }
+
+    stopSpinner(); // ensure cleanup if stream ends with no content
 
     // Restore cursor, clear streamed text, render formatted markdown
     process.stdout.write("\x1b8\x1b[J");
