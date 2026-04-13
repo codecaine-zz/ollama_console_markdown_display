@@ -62,8 +62,8 @@ bun run index.ts [options] [prompt]
 
 **In chat mode:**
 - Type your message and press Enter
-- \`copy <n>\` — copy code block #n to clipboard
-- \`copy all\` — copy all code blocks
+- \`<n>\` — copy code block #n to clipboard
+- \`all\` — copy all code blocks
 - \`save <file>\` — save last response to a file
 - \`model <name>\` — switch to a different model
 - \`models\` — list available Ollama models
@@ -236,7 +236,7 @@ function showCodeBlockIndex(blocks: { lang: string; code: string }[]) {
             ? "1 code block found"
             : `${blocks.length} code blocks found`;
     console.log(
-        `\n\x1b[2m📋 ${label} — type \x1b[0m\x1b[36mcopy <n>\x1b[0m\x1b[2m to copy (1-${blocks.length}), or \x1b[0m\x1b[36mcopy all\x1b[0m`,
+        `\n\x1b[2m📋 ${label} — type \x1b[0m\x1b[36m<n>\x1b[0m\x1b[2m to copy (1-${blocks.length}), or \x1b[0m\x1b[36mall\x1b[0m`,
     );
     for (let i = 0; i < blocks.length; i++) {
         const b = blocks[i]!;
@@ -342,7 +342,7 @@ async function main() {
             });
             const ask = (): Promise<string> =>
                 new Promise((resolve) =>
-                    rl.question("\x1b[2m(copy <n> / copy all / enter to exit):\x1b[0m ", resolve),
+                    rl.question("\x1b[2m(<n> / all / enter to exit):\x1b[0m ", resolve),
                 );
 
             while (true) {
@@ -355,7 +355,7 @@ async function main() {
                 if (await handleCopyCommand(trimmed, blocks)) {
                     continue;
                 }
-                console.log("\x1b[2mType copy <n>, copy all, or press enter to exit\x1b[0m");
+                console.log("\x1b[2mType <n>, all, or press enter to exit\x1b[0m");
             }
         }
         console.log();
@@ -367,7 +367,7 @@ async function main() {
 
     process.stdout.write(
         renderMarkdown(
-            "---\n**Chat started.** Type `exit` to quit, `copy <n>` to copy code blocks.\n\n---",
+            "---\n**Chat started.** Type `exit` to quit, `<n>` to copy code blocks.\n\n---",
         ),
     );
 
@@ -467,13 +467,13 @@ async function main() {
             if (lastBlocks.length > 0) {
                 const askCopy = (): Promise<string> =>
                     new Promise((resolve) =>
-                        rl.question("\x1b[2m(copy <n> / copy all / enter to continue):\x1b[0m ", resolve),
+                        rl.question("\x1b[2m(<n> / all / enter to continue):\x1b[0m ", resolve),
                     );
                 while (true) {
                     const copyInput = (await askCopy()).trim();
                     if (!copyInput) break;
                     if (await handleCopyCommand(copyInput, lastBlocks)) continue;
-                    console.log("\x1b[2mType copy <n>, copy all, or press enter to continue\x1b[0m");
+                    console.log("\x1b[2mType <n>, all, or press enter to continue\x1b[0m");
                 }
             }
         } catch (err: any) {

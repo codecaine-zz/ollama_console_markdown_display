@@ -80,16 +80,16 @@ bun run index.ts -h
 
 ### Chat commands
 
-| Command             | Action                            |
-| ------------------- | --------------------------------- |
-| `<n>` or `copy <n>` | Copy code block #n to clipboard   |
-| `all` or `copy all` | Copy all code blocks to clipboard |
-| `save <file>`       | Save last response to a file      |
-| `model <name>`      | Switch to a different model       |
-| `models`            | List available Ollama models      |
-| `think`             | Toggle thinking mode on/off       |
-| `think on/off`      | Set thinking mode explicitly      |
-| `exit` / `quit`     | End the chat                      |
+| Command         | Action                            |
+| --------------- | --------------------------------- |
+| `<n>`           | Copy code block #n to clipboard   |
+| `all`           | Copy all code blocks to clipboard |
+| `save <file>`   | Save last response to a file      |
+| `model <name>`  | Switch to a different model       |
+| `models`        | List available Ollama models      |
+| `think`         | Toggle thinking mode on/off       |
+| `think on/off`  | Set thinking mode explicitly      |
+| `exit` / `quit` | End the chat                      |
 
 After each response with code blocks, a copy prompt appears where you can type a block number, `all`, or press enter to continue chatting.
 
