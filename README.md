@@ -117,5 +117,5 @@ Then run it directly:
 Optionally move it to your PATH:
 
 ```bash
-mv ollama-chat /usr/local/bin/
+sudo mv ollama-chat /usr/local/bin/
 ```
