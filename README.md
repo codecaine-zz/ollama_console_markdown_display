@@ -2,6 +2,10 @@
 
 Chat with Ollama models in your terminal with beautifully rendered markdown output and clipboard-copyable code blocks. Powered by Bun v1.3.12's `Bun.markdown.ansi()` API.
 
+## Demo
+
+![Demo](demo.gif)
+
 ## Requirements
 
 - macOS (ARM or Intel)
